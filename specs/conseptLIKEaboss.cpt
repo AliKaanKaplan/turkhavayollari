@@ -1,0 +1,9 @@
+Created by testinium on 16.01.2020
+
+This is a concept file with following syntax for each concept.
+#Android Uygulamasi acilir.
+*"com.turkishairlines.mobile" and "com.turkishairlines.mobile.ui.ACSplash" Application opens
+*"5" saniye bekle
+
+#Bilet al butonuna basilir.
+*xpathli butonuna basilir

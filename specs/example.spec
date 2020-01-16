@@ -7,8 +7,9 @@ To execute this specification, run
 	gauge run specs
 
 
-## Vowel counts in single word
+## ANDROID
 -------------------------------------
-tags:UygulamayiAyagaKaldirma
-*deneme123
-*deneme124
+tags:IOSkosumu
+*Android Uygulamasi acilir.
+*Bilet al butonuna basilir.
+

@@ -1,0 +1,11 @@
+[
+  {
+    "key": "appPackage",
+    "androidValue": "com.turkishairlines.mobile"
+  }
+,
+  {
+    "key": "appActivity",
+    "androidValue": "com.turkishairlines.mobile.ui.ACSplash"
+  }
+]

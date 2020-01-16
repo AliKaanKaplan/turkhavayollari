@@ -4,7 +4,6 @@ import selector.SelectorFactory;
 import selector.SelectorType;
 import com.thoughtworks.gauge.AfterScenario;
 import com.thoughtworks.gauge.BeforeScenario;
-import com.thoughtworks.gauge.ExecutionContext;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
@@ -21,43 +20,32 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
-import java.security.GeneralSecurityException;
 import java.util.concurrent.TimeUnit;
 
 public class HookImpl {
     protected Logger logger = LoggerFactory.getLogger(getClass());
     protected static AppiumDriver<MobileElement> appiumDriver;
     protected static FluentWait<AppiumDriver> appiumFluentWait;
-    public static boolean localAndroid = false;//turn off android
+    public static boolean localAndroid = true;//turn off android
     protected static Selector selector;
     public static String currentPhoneType;
-    public static String bannedURL;
-    public static String profil;
-    public static String bolge;
 
 
     @BeforeScenario
-    public void beforeScenario() throws IOException, GeneralSecurityException {
+    public void beforeScenario() throws IOException{
 
         if (StringHelper.isEmpty(System.getenv("key"))) {
-            if (localAndroid) {
-                bannedURL="xnxx.com";
-                profil="GI2";
-                bolge="ADANASSR1";
-                currentPhoneType ="A7"; //local için
+            if (localAndroid) {//local için
                 logger.info("Local Browser");
                 DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
-                desiredCapabilities
-                        .setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
-                desiredCapabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "Galaxy A7 (2018)");
-                desiredCapabilities.setCapability(MobileCapabilityType.UDID, "R58M40CLSFJ");
-                desiredCapabilities
-                        .setCapability(AndroidMobileCapabilityType.APP_PACKAGE,
-                                "com.samsung.android.messaging");
-                desiredCapabilities
-                        .setCapability(AndroidMobileCapabilityType.APP_ACTIVITY,
-                                "com.samsung.android.messaging.ui.view.main.WithActivity");
-                //desiredCapabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, "uiautomator2");
+                desiredCapabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
+                desiredCapabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "XIAOMI8");
+                desiredCapabilities.setCapability(MobileCapabilityType.UDID, "dd785ff2");
+                desiredCapabilities.setCapability(MobileCapabilityType.VERSION, "9.0");
+                desiredCapabilities.setCapability(AndroidMobileCapabilityType.APP_PACKAGE,
+                                "com.android.mms");
+                desiredCapabilities.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY,
+                                "com.android.mms.ui.MmsTabActivity");
                 desiredCapabilities.setCapability(MobileCapabilityType.NO_RESET, true);
                 desiredCapabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 300);
                 desiredCapabilities.setCapability("unicodeKeyboard", false);
@@ -83,73 +71,28 @@ public class HookImpl {
                 URL url = new URL("http://127.0.0.1:4723/wd/hub");
                 appiumDriver = new IOSDriver<>(url, desiredCapabilities);
             }
-        } else {
-            bannedURL="";
+        }
+        // TESTINIUM İÇİN Alt taraf çalışacak.
+        else {
             String hubURL = "http://172.20.1.50:4444/wd/hub";
             DesiredCapabilities capabilities = new DesiredCapabilities();
             System.out.println("key:" + System.getenv("key"));
             System.out.println("platform" + System.getenv("platform"));
             System.out.println("version" + System.getenv("version"));
             currentPhoneType = System.getenv("browser");
-            bannedURL = System.getenv("bannedURL");
-
-            ////////////////////////////////////
-
-            profil = System.getenv("profil");
-            bolge = System.getenv("bolge");
-            /// Tarihi  ve lokasyonu yazdır
-//            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-//            LocalDateTime now = LocalDateTime.now();
-//            System.out.println(dtf.format(now));
-//            GoogleExel.whriteWithAdress("E",String.valueOf(dtf.format(now)));
-//            GoogleExel.whriteWithAdress("C",bolge.toString());
-
-            /////////////////////////////////////
 
 
+            // Eğer platform androidse if içindekiler çalışır değil ise else tarafından ios başlar
             if (System.getenv("platform").equals("ANDROID")) {
                 capabilities.setCapability("key", System.getenv("key"));
-
-                // capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME,"uiautomator2");
-                //capabilities.setCapability(MobileCapabilityType.FULL_RESET, true);
-                //capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 300);
                 capabilities.setCapability(MobileCapabilityType.NO_RESET, true);
                 capabilities.setCapability("unicodeKeyboard", false);
                 capabilities.setCapability("resetKeyboard", false);
-
-
-                if (currentPhoneType.contains("MATE20")) {
-
-                    capabilities
-                            .setCapability(AndroidMobileCapabilityType.APP_PACKAGE,
-                                    "com.google.android.apps.messaging");
-                    capabilities
-                            .setCapability(AndroidMobileCapabilityType.APP_ACTIVITY,
-                                    "com.google.android.apps.messaging.ui.conversationlist.ConversationListActivity");
-
-
-                } else {
-                    capabilities
-                            .setCapability(AndroidMobileCapabilityType.APP_PACKAGE,
-                                    "com.samsung.android.messaging");
-                    capabilities
-                            .setCapability(AndroidMobileCapabilityType.APP_ACTIVITY,
-                                    "com.samsung.android.withtalk.ui.WithActivity");
-
-
-                }
-
-
-
-
                 appiumDriver = new AndroidDriver(new URL(hubURL), capabilities);
                 localAndroid = true;
-
                 System.out.println(currentPhoneType);
-
-
-
-            } else {
+            }
+            else {
                 capabilities
                         .setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
                 capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, "XCUITest");
@@ -161,6 +104,7 @@ public class HookImpl {
                 localAndroid = false;
             }
         }
+
         selector = SelectorFactory
                 .createElementHelper(localAndroid ? SelectorType.ANDROID : SelectorType.IOS);
         appiumDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
@@ -173,17 +117,16 @@ public class HookImpl {
     }
 
     @AfterScenario
-    public void lastExel(ExecutionContext exexutionContext) throws IOException, GeneralSecurityException {
-//        if (exexutionContext.getCurrentScenario().getIsFailing()){
-//            System.out.println(exexutionContext.getCurrentScenario().toString());
-//            GoogleExel.whriteWithAdress(ExelHelper.exelHelper(exexutionContext.getCurrentScenario().getName().toString()),"NOK");
-//        }else
-//        {
-//            System.out.println(exexutionContext.getCurrentScenario().getName());
-//            GoogleExel.whriteWithAdress(ExelHelper.exelHelper(exexutionContext.getCurrentScenario().getName().toString()),"OK");
-//        }
-    }
     public void afterScenario() {
         appiumDriver.quit();
+
+        /// Tarihi  ve lokasyonu yazdır
+//            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+//            LocalDateTime now = LocalDateTime.now();
+//            System.out.println(dtf.format(now));
+//            GoogleExel.whriteWithAdress("E",String.valueOf(dtf.format(now)));
+//            GoogleExel.whriteWithAdress("C",bolge.toString());
+
+        /////////////////////////////////////
     }
 }
